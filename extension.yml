@@ -1,0 +1,6 @@
+name: SpellSigns
+version: 1.0
+description: Allow Spells to be learnt and unlearnt through signs. A HarryPotterSpells extension
+
+main: com.gmail.jacklin213.spellsigns.SpellSigns
+authors: jacklin213
