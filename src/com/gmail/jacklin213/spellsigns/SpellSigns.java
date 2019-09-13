@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.hpspells.core.api.APIHandler;
 import com.hpspells.core.extension.Extension;
+import com.hpspells.core.spell.Spell;
 import com.hpspells.core.spell.SpellManager;
 
 public class SpellSigns extends Extension {
@@ -79,18 +80,26 @@ public class SpellSigns extends Extension {
 		Material material = event.getClickedBlock().getType();
 		Player player = event.getPlayer();
 		if (material == Material.SIGN || material == Material.WALL_SIGN || material == Material.LEGACY_SIGN_POST) {
-			Sign sign = (Sign) event.getClickedBlock().getState();
-			if (sign.getLine(0).equalsIgnoreCase("[SpellSigns]")) {
-				if (sign.getLines().length == 1) 
-					player.sendMessage(ChatColor.RED + "This sign is not assigned to any spells");
-				else if (sign.getLines().length == 2) {
-					if (spellManager.getSpell(sign.getLine(1)) != null) {
-						player.sendMessage("Yay this spell exists");
-					} else {
-						player.sendMessage(ChatColor.RED + "This is not a valid spell");
-					}
-				}
-			}
+		    Sign sign = (Sign) event.getClickedBlock().getState();
+		    if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
+//                log.info("Line 2: " + sign.getLine(1).isEmpty()); See if spell line is empty
+                if (sign.getLine(1).trim().isEmpty()) 
+                    player.sendMessage(ChatColor.RED + "This sign is not assigned to any spells");
+                else {
+                    String spellName = ChatColor.stripColor(sign.getLine(1));
+                    if (spellManager.isSpell(spellName)) {
+                        Spell spell = spellManager.getSpell(spellName);
+                        if (spell.playerKnows(player)) {
+                           player.sendMessage(ChatColor.RED + "You already know this spell!");
+                        } else {
+                            spell.teach(player);
+                            player.sendMessage(ChatColor.GREEN + "You have successfully learnt " + spellName);
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "This is not a valid spell");
+                    }
+                }
+            }
 		}
 	}
 }
