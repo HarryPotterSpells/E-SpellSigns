@@ -20,7 +20,7 @@ import com.hpspells.core.spell.SpellManager;
 
 public class SpellSigns extends Extension {
 	
-	Logger log; //TODO: Does not work atm
+	Logger log;
 	APIHandler API;
 	SpellManager spellManager;
 	
@@ -53,7 +53,7 @@ public class SpellSigns extends Extension {
 			}
 		}
 		b = event.getBlock();
-		if (b.getType() == Material.SIGN || b.getType() == Material.SIGN_POST) {
+		if (b.getType() == Material.SIGN || b.getType() == Material.LEGACY_SIGN_POST) {
 			if (event.getPlayer().hasPermission("spellsigns.destroy")) {
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "SpellSign is destroyed");
 			} else {
@@ -81,7 +81,7 @@ public class SpellSigns extends Extension {
 		Action action = event.getAction();
 		Player player = event.getPlayer();
 		if ((action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK)
-				&& (material == Material.SIGN || material == Material.SIGN_POST || material == Material.WALL_SIGN) 
+				&& (material == Material.SIGN || material == Material.LEGACY_SIGN_POST || material == Material.WALL_SIGN) 
 				&& event.getClickedBlock().getState() instanceof Sign) {
 			Sign sign = (Sign) event.getClickedBlock().getState();
 			if (sign.getLine(0).equalsIgnoreCase("[SpellSigns]")) {
