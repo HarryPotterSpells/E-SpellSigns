@@ -29,11 +29,8 @@ public class SpellSigns extends Extension {
 		log = getLogger();
 		API = APIHandler.getInstance();
 		spellManager = APIHandler.getSpellManager();
-	}
 	
-	@Override
-	public void onDisable() {
-		
+		log.info("Version: " + this.getVersion() + " has been enabled!");
 	}
 	
 	@EventHandler
