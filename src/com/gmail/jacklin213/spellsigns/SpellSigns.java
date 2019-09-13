@@ -65,21 +65,20 @@ public class SpellSigns extends Extension {
 		if (event.getLine(0).equalsIgnoreCase("spellsigns") 
 				|| event.getLine(0).equalsIgnoreCase("[spellsigns]")) {
 			event.setLine(0, ChatColor.BLUE + "[SpellSigns]");
-			if (event.getLines().length > 1) {
-				if (spellManager.getSpell(event.getLine(1)) != null)
-					event.setLine(1, ChatColor.YELLOW + event.getLine(1));
-			}
+			if (spellManager.isSpell(event.getLine(1)))
+                event.setLine(1, ChatColor.YELLOW + event.getLine(1));
 		}
 	}
 	
 	@EventHandler
 	public void onSignClick(PlayerInteractEvent event) {
-		Material material = event.getMaterial();
 		Action action = event.getAction();
+		if (action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_BLOCK) {
+            return;
+        }
+		Material material = event.getClickedBlock().getType();
 		Player player = event.getPlayer();
-		if ((action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK)
-				&& (material == Material.SIGN || material == Material.LEGACY_SIGN_POST || material == Material.WALL_SIGN) 
-				&& event.getClickedBlock().getState() instanceof Sign) {
+		if (material == Material.SIGN || material == Material.WALL_SIGN || material == Material.LEGACY_SIGN_POST) {
 			Sign sign = (Sign) event.getClickedBlock().getState();
 			if (sign.getLine(0).equalsIgnoreCase("[SpellSigns]")) {
 				if (sign.getLines().length == 1) 
