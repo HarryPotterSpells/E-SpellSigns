@@ -50,7 +50,7 @@ public class SpellSigns extends Extension {
 			}
 		}
 		b = event.getBlock();
-		if (b.getType() == Material.SIGN || b.getType() == Material.LEGACY_SIGN_POST) {
+		if (b.getType() == Material.SIGN || b.getType() == Material.WALL_SIGN|| b.getType() == Material.LEGACY_SIGN_POST) {
 			if (event.getPlayer().hasPermission("spellsigns.destroy")) {
 				event.getPlayer().sendMessage(ChatColor.YELLOW + "SpellSign is destroyed");
 			} else {
