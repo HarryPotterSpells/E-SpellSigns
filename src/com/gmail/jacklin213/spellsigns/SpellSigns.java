@@ -20,24 +20,24 @@ import com.hpspells.core.spell.Spell;
 import com.hpspells.core.spell.SpellManager;
 
 public class SpellSigns extends Extension {
-	
-	Logger log;
-	APIHandler API;
-	SpellManager spellManager;
-	
-	@Override
-	public void onEnable() {
-		log = getLogger();
-		API = APIHandler.getInstance();
-		spellManager = APIHandler.getSpellManager();
-	
-		log.info("Version: " + this.getVersion() + " has been enabled!");
-	}
-	
-	@EventHandler
-	public void onSignDestroy(BlockBreakEvent event) {
-	    Block b = event.getBlock();
-        if (b.getType() == Material.SIGN || b.getType() == Material.WALL_SIGN|| b.getType() == Material.LEGACY_SIGN_POST) {
+
+    Logger log;
+    APIHandler API;
+    SpellManager spellManager;
+
+    @Override
+    public void onEnable() {
+        log = getLogger();
+        API = APIHandler.getInstance();
+        spellManager = APIHandler.getSpellManager();
+
+        log.info("Version: " + this.getVersion() + " has been enabled!");
+    }
+
+    @EventHandler
+    public void onSignDestroy(BlockBreakEvent event) {
+        Block b = event.getBlock();
+        if (b.getType() == Material.SIGN || b.getType() == Material.WALL_SIGN || b.getType() == Material.LEGACY_SIGN_POST) {
             Sign sign = (Sign) b.getState();
             if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
                 if (event.getPlayer().hasPermission("spellsigns.destroy")) {
@@ -58,18 +58,18 @@ public class SpellSigns extends Extension {
                     return;
                 }
             }
-            
+
             // Check if side of blocks have a SpellSigns wall sign
-            BlockFace[] bf = new BlockFace[] {
-                    BlockFace.EAST,
-                    BlockFace.SOUTH,
-                    BlockFace.WEST,
-                    BlockFace.NORTH
+            BlockFace[] bf = new BlockFace[] { 
+                    BlockFace.EAST, 
+                    BlockFace.SOUTH, 
+                    BlockFace.WEST, 
+                    BlockFace.NORTH 
             };
             for (BlockFace face : bf) {
                 b = event.getBlock().getRelative(face);
                 if (b.getType() == Material.WALL_SIGN) {
-                    //block has a sign on it, don't break!
+                    // block has a sign on it, don't break!
                     Sign sign = (Sign) b.getState();
                     if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
                         event.setCancelled(true);
@@ -78,38 +78,37 @@ public class SpellSigns extends Extension {
                 }
             }
         }
-	}
-	
-	@EventHandler
-	public void onSignCreate(SignChangeEvent event) {
-		if (event.getLine(0).equalsIgnoreCase("spellsigns") 
-				|| event.getLine(0).equalsIgnoreCase("[spellsigns]")) {
-			event.setLine(0, ChatColor.BLUE + "[SpellSigns]");
-			if (spellManager.isSpell(event.getLine(1)))
+    }
+
+    @EventHandler
+    public void onSignCreate(SignChangeEvent event) {
+        if (event.getLine(0).equalsIgnoreCase("spellsigns") || event.getLine(0).equalsIgnoreCase("[spellsigns]")) {
+            event.setLine(0, ChatColor.BLUE + "[SpellSigns]");
+            if (spellManager.isSpell(event.getLine(1)))
                 event.setLine(1, ChatColor.YELLOW + event.getLine(1));
-		}
-	}
-	
-	@EventHandler
-	public void onSignClick(PlayerInteractEvent event) {
-		Action action = event.getAction();
-		if (action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_BLOCK) {
+        }
+    }
+
+    @EventHandler
+    public void onSignClick(PlayerInteractEvent event) {
+        Action action = event.getAction();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_BLOCK) {
             return;
         }
-		Material material = event.getClickedBlock().getType();
-		Player player = event.getPlayer();
-		if (material == Material.SIGN || material == Material.WALL_SIGN || material == Material.LEGACY_SIGN_POST) {
-		    Sign sign = (Sign) event.getClickedBlock().getState();
-		    if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
-//                log.info("Line 2: " + sign.getLine(1).isEmpty()); See if spell line is empty
-                if (sign.getLine(1).trim().isEmpty()) 
+        Material material = event.getClickedBlock().getType();
+        Player player = event.getPlayer();
+        if (material == Material.SIGN || material == Material.WALL_SIGN || material == Material.LEGACY_SIGN_POST) {
+            Sign sign = (Sign) event.getClickedBlock().getState();
+            if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
+                // log.info("Line 2: " + sign.getLine(1).isEmpty()); See if spell line is empty
+                if (sign.getLine(1).trim().isEmpty())
                     player.sendMessage(ChatColor.RED + "This sign is not assigned to any spells");
                 else {
                     String spellName = ChatColor.stripColor(sign.getLine(1));
                     if (spellManager.isSpell(spellName)) {
                         Spell spell = spellManager.getSpell(spellName);
                         if (spell.playerKnows(player)) {
-                           player.sendMessage(ChatColor.RED + "You already know this spell!");
+                            player.sendMessage(ChatColor.RED + "You already know this spell!");
                         } else {
                             spell.teach(player);
                             player.sendMessage(ChatColor.GREEN + "You have successfully learnt " + spellName);
@@ -119,6 +118,6 @@ public class SpellSigns extends Extension {
                     }
                 }
             }
-		}
-	}
+        }
+    }
 }
