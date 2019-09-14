@@ -36,29 +36,48 @@ public class SpellSigns extends Extension {
 	
 	@EventHandler
 	public void onSignDestroy(BlockBreakEvent event) {
-		BlockFace[] bf = new BlockFace[] {
-			    BlockFace.EAST,
-			    BlockFace.SOUTH,
-			    BlockFace.WEST,
-			    BlockFace.NORTH
-		};
-		Block b;
-		for (int i = 3; i > 0; i--) {
-			b = event.getBlock().getRelative(bf[(i)]);
-			if (b.getType() == Material.WALL_SIGN) {
-				//block has a sign on it, don't break!
-				event.setCancelled(true);
-			}
-		}
-		b = event.getBlock();
-		if (b.getType() == Material.SIGN || b.getType() == Material.WALL_SIGN|| b.getType() == Material.LEGACY_SIGN_POST) {
-			if (event.getPlayer().hasPermission("spellsigns.destroy")) {
-				event.getPlayer().sendMessage(ChatColor.YELLOW + "SpellSign is destroyed");
-			} else {
-				event.getPlayer().sendMessage(ChatColor.RED + "You do not have the permission to destory this sign");
-				event.setCancelled(true);
-			}
-		}
+	    Block b = event.getBlock();
+        if (b.getType() == Material.SIGN || b.getType() == Material.WALL_SIGN|| b.getType() == Material.LEGACY_SIGN_POST) {
+            Sign sign = (Sign) b.getState();
+            if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
+                if (event.getPlayer().hasPermission("spellsigns.destroy")) {
+                    event.getPlayer().sendMessage(ChatColor.YELLOW + "SpellSign is destroyed");
+                } else {
+                    event.getPlayer().sendMessage(ChatColor.RED + "You do not have the permission to destory this sign");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        } else {
+            b = b.getRelative(BlockFace.UP);
+            // Check if block above is a Sign post pre 1.13.2 otherwise check if it is a Sign
+            if (b.getType() == Material.LEGACY_SIGN_POST || b.getType() == Material.SIGN) {
+                Sign sign = (Sign) b.getState();
+                if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+            
+            // Check if side of blocks have a SpellSigns wall sign
+            BlockFace[] bf = new BlockFace[] {
+                    BlockFace.EAST,
+                    BlockFace.SOUTH,
+                    BlockFace.WEST,
+                    BlockFace.NORTH
+            };
+            for (BlockFace face : bf) {
+                b = event.getBlock().getRelative(face);
+                if (b.getType() == Material.WALL_SIGN) {
+                    //block has a sign on it, don't break!
+                    Sign sign = (Sign) b.getState();
+                    if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
 	}
 	
 	@EventHandler
