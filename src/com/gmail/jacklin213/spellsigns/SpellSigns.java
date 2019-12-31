@@ -24,6 +24,7 @@ public class SpellSigns extends Extension {
     Logger log;
     APIHandler API;
     SpellManager spellManager;
+    String prefix = "[" + ChatColor.YELLOW + "SpellSigns" + ChatColor.WHITE + "] ";
 
     @Override
     public void onEnable() {
@@ -37,23 +38,24 @@ public class SpellSigns extends Extension {
     @EventHandler
     public void onSignDestroy(BlockBreakEvent event) {
         Block b = event.getBlock();
-        if (b.getType() == Material.SIGN || b.getType() == Material.WALL_SIGN || b.getType() == Material.LEGACY_SIGN_POST) {
+        if (b.getType().toString().contains("SIGN")) {
             Sign sign = (Sign) b.getState();
             if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
                 if (event.getPlayer().hasPermission("spellsigns.destroy")) {
-                    event.getPlayer().sendMessage(ChatColor.YELLOW + "SpellSign is destroyed");
+                    event.getPlayer().sendMessage(prefix + ChatColor.YELLOW + "SpellSign is destroyed");
                 } else {
-                    event.getPlayer().sendMessage(ChatColor.RED + "You do not have the permission to destory this sign");
+                    event.getPlayer().sendMessage(prefix + ChatColor.RED + "You do not have the permission to destory this sign");
                     event.setCancelled(true);
                     return;
                 }
             }
         } else {
             b = b.getRelative(BlockFace.UP);
-            // Check if block above is a Sign post pre 1.13.2 otherwise check if it is a Sign
-            if (b.getType() == Material.LEGACY_SIGN_POST || b.getType() == Material.SIGN) {
+            // Check if block above is a Sign/Sign post
+            if (b.getType().toString().contains("SIGN")) {
                 Sign sign = (Sign) b.getState();
                 if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
+                	event.getPlayer().sendMessage(prefix + ChatColor.RED + "Please remove the sign first!");
                     event.setCancelled(true);
                     return;
                 }
@@ -68,10 +70,11 @@ public class SpellSigns extends Extension {
             };
             for (BlockFace face : bf) {
                 b = event.getBlock().getRelative(face);
-                if (b.getType() == Material.WALL_SIGN) {
+                if (b.getType().toString().contains("WALL_SIGN")) {
                     // block has a sign on it, don't break!
                     Sign sign = (Sign) b.getState();
                     if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
+                    	event.getPlayer().sendMessage(prefix + ChatColor.RED + "Please remove the sign first!");
                         event.setCancelled(true);
                         return;
                     }
@@ -97,24 +100,24 @@ public class SpellSigns extends Extension {
         }
         Material material = event.getClickedBlock().getType();
         Player player = event.getPlayer();
-        if (material == Material.SIGN || material == Material.WALL_SIGN || material == Material.LEGACY_SIGN_POST) {
+        if (material.toString().contains("SIGN")) {
             Sign sign = (Sign) event.getClickedBlock().getState();
             if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("[SpellSigns]")) {
                 // log.info("Line 2: " + sign.getLine(1).isEmpty()); See if spell line is empty
                 if (sign.getLine(1).trim().isEmpty())
-                    player.sendMessage(ChatColor.RED + "This sign is not assigned to any spells");
+                    player.sendMessage(prefix + ChatColor.RED + "This sign is not assigned to any spells");
                 else {
                     String spellName = ChatColor.stripColor(sign.getLine(1));
                     if (spellManager.isSpell(spellName)) {
                         Spell spell = spellManager.getSpell(spellName);
                         if (spell.playerKnows(player)) {
-                            player.sendMessage(ChatColor.RED + "You already know this spell!");
+                            player.sendMessage(prefix + ChatColor.RED + "You already know this spell!");
                         } else {
                             spell.teach(player);
-                            player.sendMessage(ChatColor.GREEN + "You have successfully learnt " + spellName);
+                            player.sendMessage(prefix + ChatColor.GREEN + "You have successfully learnt " + spellName);
                         }
                     } else {
-                        player.sendMessage(ChatColor.RED + "This is not a valid spell");
+                        player.sendMessage(prefix + ChatColor.RED + "This is not a valid spell");
                     }
                 }
             }
